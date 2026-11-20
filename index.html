@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python 第二阶段 · 闯关学习台</title>
+<style>
+:root{
+  --orange:#E4572E; --orange-soft:#FFF2ED; --orange-line:#F6C9B8;
+  --ink:#1A1D21; --muted:#6E7480; --line:#E6E2DA; --bg:#FAF8F4;
+  --card:#fff; --green:#2F7A5C; --green-soft:#EDF6F1;
+  --code-bg:#1E2430; --code-ink:#E8ECF3;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
+
+/* header */
+header{position:sticky;top:0;z-index:50;background:rgba(250,248,244,.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);padding:12px 22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+header h1{font-size:16.5px;font-weight:700;margin-right:4px;}
+header h1 small{font-weight:500;color:var(--muted);font-size:12px;margin-left:8px;}
+.stat{font-size:12.5px;color:var(--muted);background:#fff;border:1px solid var(--line);
+  padding:3px 10px;border-radius:99px;font-variant-numeric:tabular-nums;}
+.stat b{color:var(--orange);}
+header h1{display:flex;align-items:center;gap:7px;}
+header h1 svg{flex:0 0 auto;}
+.lvl{display:flex;flex-direction:column;gap:5px;min-width:132px;padding:4px 11px 6px;
+  background:#fff;border:1px solid var(--line);border-radius:12px;}
+.lvl .t{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;line-height:1.2;}
+.lvl .t b{color:var(--orange);font-variant-numeric:tabular-nums;font-weight:700;}
+.lvl .bar{height:5px;background:#EDE8DF;border-radius:99px;overflow:hidden;}
+.lvl .bar i{display:block;height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,#E4572E,#F2B705);transition:width .5s ease;}
+.engine{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);}
+.dot{width:9px;height:9px;border-radius:50%;background:#C9C4BB;transition:.3s;}
+.dot.loading{background:var(--orange);animation:pulse 1s infinite;}
+.dot.ready{background:var(--green);animation:none;}
+@keyframes pulse{50%{opacity:.35;}}
+
+/* layout */
+.layout{display:grid;grid-template-columns:252px 1fr;max-width:1200px;margin:0 auto;gap:26px;padding:22px;}
+nav{position:sticky;top:64px;align-self:start;max-height:calc(100vh - 80px);overflow:auto;padding-bottom:20px;}
+.unit-group{margin-bottom:16px;}
+.unit-head{font-size:12.5px;font-weight:700;color:var(--muted);padding:6px 10px;letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.unit-head .lv{color:var(--orange);margin-right:6px;}
+.unit-head .trophy{margin-left:4px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:13.5px;color:#3A3F46;
+  border-radius:8px;cursor:pointer;transition:.15s;}
+.nav-item>span:nth-child(2){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-item:hover{background:#F1EEE8;}
+.nav-item.active{background:var(--orange-soft);color:#B8431F;font-weight:600;}
+.nav-item .ok{color:var(--green);font-weight:700;margin-left:auto;font-size:12px;}
+.nav-item .kind{font-size:10.5px;color:#A9A49B;border:1px solid var(--line);border-radius:4px;padding:0 4px;flex:0 0 auto;}
+.review-toggle{font-size:12.5px;font-weight:700;color:var(--muted);padding:8px 10px;cursor:pointer;
+  border-top:1px solid var(--line);margin-top:6px;display:flex;justify-content:space-between;align-items:center;}
+.review-list{display:none;padding:4px 10px;}
+.review-list.open{display:block;}
+.review-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#3A3F46;padding:4px 0;cursor:pointer;}
+.review-item .num{flex:0 0 auto;width:18px;height:18px;border-radius:50%;background:#F1EEE8;color:#7C776E;
+  font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+.review-item.on .num{background:var(--orange);color:#fff;}
+.review-item.on{color:#B8431F;}
+
+/* main */
+main{min-width:0;max-width:820px;}
+.crumb{font-size:12.5px;color:var(--muted);margin-bottom:6px;}
+h2.title{font-size:22px;font-weight:700;letter-spacing:-.01em;margin-bottom:4px;}
+.meta-line{font-size:13px;color:var(--muted);margin-bottom:18px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:16px;}
+.card h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.card h3 .bar{width:4px;height:15px;border-radius:2px;background:var(--orange);flex:0 0 auto;}
+.card p,.card li{font-size:14px;color:#33383E;}
+.card ol,.card ul{padding-left:20px;}
+.card li{margin-bottom:7px;}
+.card li b{color:var(--ink);}
+.k{color:var(--orange);font-weight:700;}
+.deliver-tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--green);background:var(--green-soft);
+  border-radius:5px;padding:2px 8px;margin-left:8px;vertical-align:2px;}
+
+/* mascot */
+.mascot{display:flex;align-items:flex-start;gap:12px;background:#FFF9E8;border:1px solid #F0E2B6;
+  border-radius:14px;padding:13px 16px;margin-bottom:16px;}
+.mascot .face{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:#fff;border:2px solid #4C8C3F;
+  display:flex;align-items:center;justify-content:center;font-size:25px;}
+.mascot .bubble{font-size:14px;color:#5C4A1E;padding-top:7px;line-height:1.55;}
+.mascot .bubble b{color:#3E6B2F;}
+
+/* analogy */
+.analogy{background:var(--orange-soft);border-color:var(--orange-line);}
+.analogy p{color:#6B3A28;}
+.analogy .sub{font-size:13px;color:#9A5B44;margin-top:7px;}
+
+/* try card */
+.try{background:#F3F7FF;border-color:#C9D9F5;}
+.try h3 .bar{background:#3E7CB1;}
+.try li{color:#2E4A73;}
+.try li b{color:#1F3A5F;}
+
+/* line notes */
+.ln{display:grid;grid-template-columns:minmax(190px,42%) 1fr;gap:12px;padding:10px 0;
+  border-bottom:1px dashed var(--line);align-items:start;}
+.ln:last-child{border-bottom:none;}
+.ln pre{background:#F6F4EF;border-radius:8px;padding:8px 10px;font-family:"JetBrains Mono",Consolas,"Courier New",monospace;
+  font-size:12.3px;white-space:pre-wrap;word-break:break-all;color:#2A2F36;}
+.ln p{font-size:13px;color:#4A4F56;padding-top:5px;}
+.ln p b{color:var(--ink);}
+
+/* sample io */
+.io{background:#F6F4EF;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:10px 0;font-size:13px;}
+.io .lbl{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:4px;}
+.io pre{font-family:"JetBrains Mono",Consolas,"Courier New",monospace;font-size:12.5px;color:#2A2F36;white-space:pre-wrap;word-break:break-all;}
+.io-body{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* editor */
+canvas#labCanvas{display:block;background:#fff;border:1px solid var(--line);border-radius:10px;margin:4px auto 6px;max-width:100%;}
+.ed-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin:14px 0 6px;}
+textarea.code,textarea.stdin{width:100%;font-family:"JetBrains Mono",Consolas,"Courier New",monospace;
+  font-size:13px;line-height:1.55;padding:12px 14px;border:1px solid #3A4354;border-radius:10px;
+  background:var(--code-bg);color:var(--code-ink);resize:vertical;outline:none;tab-size:4;}
+textarea.code{min-height:150px;}
+textarea.stdin{min-height:88px;background:#252C3A;border-color:#3A4354;}
+textarea:focus{border-color:var(--orange);}
+.btns{display:flex;gap:10px;margin:12px 0;flex-wrap:wrap;align-items:center;}
+button{border:none;border-radius:9px;padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;}
+button:disabled{opacity:.55;cursor:not-allowed;}
+.run{background:var(--orange);color:#fff;}
+.run:hover:not(:disabled){background:#D14A24;}
+.submit{background:var(--green);color:#fff;}
+.submit:hover:not(:disabled){background:#286A50;}
+.ghost{background:#fff;color:#5A554D;border:1px solid var(--line);}
+.ghost:hover{border-color:var(--orange-line);color:var(--orange);}
+.hint-btn{background:none;color:var(--muted);text-decoration:underline;font-weight:500;padding:4px 6px;}
+
+.out{background:var(--code-bg);border-radius:10px;padding:12px 14px;min-height:44px;margin-top:6px;
+  position:relative;overflow:hidden;}
+.out pre{font-family:"JetBrains Mono",Consolas,monospace;font-size:12.8px;color:var(--code-ink);white-space:pre-wrap;word-break:break-all;}
+.out .empty{color:#8B94A6;font-size:12.5px;}
+.out pre .err{color:#FF9B8A;}
+.out.pop pre{animation:popout .45s ease;}
+@keyframes popout{0%{transform:scale(.97);opacity:.25}55%{transform:scale(1.015)}100%{transform:scale(1);opacity:1}}
+.out.shake{animation:shakex .45s ease;}
+@keyframes shakex{0%,100%{transform:translateX(0)}22%{transform:translateX(-7px)}48%{transform:translateX(6px)}72%{transform:translateX(-3px)}}
+.running-line{display:flex;align-items:center;gap:9px;color:#8B94A6;font-size:12.5px;}
+.dots{display:inline-flex;align-items:flex-end;gap:4px;height:14px;}
+.dots i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#E4572E;animation:bnc 1s infinite;}
+.dots i:nth-child(2){animation-delay:.15s;background:#F2B705;}
+.dots i:nth-child(3){animation-delay:.3s;background:#2F7A5C;}
+@keyframes bnc{0%,80%,100%{transform:translateY(0);opacity:.45}40%{transform:translateY(-7px);opacity:1}}
+.snake-run{position:absolute;left:-34px;top:7px;pointer-events:none;opacity:0;
+  animation:srun 1.25s ease-in forwards;}
+.snake-run svg{transform:rotate(-8deg);}
+@keyframes srun{0%{left:-34px;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 26px);opacity:0}}
+
+.verdict{border-radius:10px;padding:13px 16px;margin-top:12px;font-size:14px;display:none;}
+.verdict.pass{display:block;background:var(--green-soft);color:#1F5C42;border:1px solid #CDE5D8;}
+.verdict.fail{display:block;background:#FDF1EE;color:#8A2F17;border:1px solid #F3D2C6;}
+.verdict .xp-gain{display:inline-block;background:#fff;border:1px solid #CDE5D8;border-radius:99px;
+  padding:1px 10px;margin-left:6px;font-size:12.5px;font-weight:700;color:var(--green);}
+.verdict .diff{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.verdict .diff pre{background:#fff;border-radius:8px;padding:9px 11px;font-size:12.3px;
+  font-family:"JetBrains Mono",Consolas,monospace;white-space:pre-wrap;max-height:180px;overflow:auto;}
+.verdict .diff .t{font-size:11.5px;font-weight:700;margin-bottom:4px;}
+.verdict .diff .a .t{color:#B8431F;} .verdict .diff .b .t{color:#2F7A5C;}
+
+.fold{border-top:1px dashed var(--line);margin-top:16px;padding-top:12px;display:none;}
+.fold.open{display:block;}
+.fold pre{background:#F6F4EF;border-radius:8px;padding:11px 13px;font-size:12.8px;
+  font-family:"JetBrains Mono",Consolas,monospace;white-space:pre-wrap;color:#2A2F36;margin-top:8px;}
+.fold p{font-size:13.5px;color:#4A4F56;}
+
+.note{font-size:12.5px;color:#A9A49B;margin-top:14px;line-height:1.6;}
+.big-tip{background:var(--orange-soft);border-left:3px solid var(--orange);border-radius:0 10px 10px 0;
+  padding:12px 15px;font-size:13.5px;color:#6B3A28;margin-bottom:16px;}
+
+/* confetti */
+.confetto{position:fixed;top:-26px;z-index:999;pointer-events:none;border-radius:2px;
+  animation:fall 1.6s ease-in forwards;}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.15;}}
+.snd-btn{padding:3px 10px;font-size:12.5px;border-radius:99px;font-weight:600;}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;gap:14px;padding:16px 14px;}
+  nav{position:static;max-height:none;order:-1;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;}
+  .unit-group{margin-bottom:6px;}
+  main{max-width:none;}
+  .verdict .diff{grid-template-columns:1fr;}
+  .io-body{grid-template-columns:1fr;}
+  .ln{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>
+    <svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true">
+      <circle cx="24" cy="24" r="17" fill="#6FA65C"/>
+      <circle cx="24" cy="24" r="17" fill="none" stroke="#4C8C3F" stroke-width="1.5"/>
+      <circle cx="18" cy="20" r="5.4" fill="#fff"/>
+      <circle cx="30" cy="20" r="5.4" fill="#fff"/>
+      <circle cx="19" cy="21" r="2.5" fill="#1A1D21"/>
+      <circle cx="29" cy="21" r="2.5" fill="#1A1D21"/>
+      <path d="M18 31c2 2.4 4 3.4 6 3.4s4-1 6-3.4" stroke="#2F5F25" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M24 37v3.5m0 0l-3 2.4m3-2.4l3 2.4" stroke="#E4572E" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </svg>
+    Python 第二阶段 · 闯关学习台<small>6 个月 · Lv.7–12</small>
+  </h1>
+  <span class="stat">练习 <b id="sEx">0</b>/12</span>
+  <span class="stat">交付物 <b id="sDe">0</b>/6</span>
+  <div class="lvl">
+    <div class="t"><span id="sLv">见习程序员</span><b id="sXp">0 / 180</b></div>
+    <div class="bar"><i id="lvlFill"></i></div>
+  </div>
+  <span class="stat">赛考复习 <b id="sRv">0</b>/24</span>
+  <button class="ghost snd-btn" id="btnSnd">音效：开</button>
+  <div class="engine"><span class="dot" id="eDot"></span><span id="eTxt">Python 引擎未加载</span></div>
+</header>
+
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+/* ================= 课程数据 ================= */
+const UNITS = [
+{lv:"Lv.7", month:"第 1 月", name:"编程基础与数据处理", items:[
+ {type:"lesson", id:"L7-1", title:"让程序听你说话：input 与 print",
+  mascot:"嗨！我是皮皮，你的学习搭档。今天学完，你就能让程序<b>跟你聊天</b>——还能让它喊你大哥（只要你写得好）。",
+  intro:[
+   "<b>print()</b> 是程序在说话：把括号里的东西显示到屏幕上。",
+   "<b>input()</b> 是程序在听你说话：它先问一句，然后<b>停下来等你打字</b>，你按了回车，它才继续。",
+   "超级大坑：input 听到的<b>永远是文字（字符串）</b>。你明明打了 3，它手里拿的是写着「3」的<b>纸条</b>，不是数字 3。",
+   "一行里来了好几个词？用 <b>.split()</b> 按空格把它们切开。",
+   "<b>int()</b> 负责把「纸条」换成真数字——换了才能做加法。"],
+  analogy:"input 像餐厅点餐：服务员问你「您要点什么」，你答什么他就端上来什么。但注意——不管你点的是 3 号套餐还是牛排，他手里拿的都是<b>写着字的纸条</b>。纸条不能拿来算账，所以 int() 就是把纸条换成真币的动作。",
+  lineNotes:[
+   [`name = input("你叫什么名字？")`, "程序先问话，然后<b>停下来等你打字</b>，你按回车后，打的字存进 name"],
+   [`print("你好,", name, "!")`, "三个东西用逗号隔开打印，逗号的位置会自动补一个空格"],
+   [`a, b = input("来两个数：").split()`, "你打「3 5」，split() 按空格切成两份，一份装进 a、一份装进 b"],
+   [`print("相加:", int(a) + int(b))`, "int(a) 把纸条「3」换成数字 3——<b>不换就不能加</b>"]],
+  tryThis:[
+   "把「你好,」改成「欢迎回家,」，再运行看看",
+   "故意在数字那一步打 abc 三个字母，看看报错说什么（报错是最好的老师）",
+   "print 里删掉一个逗号，看看输出少了什么"],
+  example:{input:"小明\n3 5\n", code:`name = input("你叫什么名字？")
+print("你好,", name, "!")
+
+a, b = input("来两个数：").split()
+print("相加:", int(a) + int(b))`},
+  tip:"print 里的逗号会自动变成一个空格，这就是为什么输出是「你好, 小明 !」。"},
+
+ {type:"lesson", id:"L7-2", title:"一行顶十行：列表推导式",
+  mascot:"这节课是<b>魔法课</b>：五行代码压成一行！学完你就是班里的「压缩代码」小能手。",
+  intro:[
+   "<b>[x * 2 for x in nums]</b> 叫「列表推导式」：对每个 x 做一次 x*2，收集成新列表。一行顶五行。",
+   "想筛一遍？加个 if：<b>[x for x in nums if x >= 60]</b> 只留及格的。",
+   "统计四兄弟：<b>max()</b> 最大、<b>min()</b> 最小、<b>sum()</b> 求和、<b>len()</b> 数个数。这四个练习里天天见。"],
+  analogy:"列表推导式是一条<b>流水线</b>：nums 是传送带上的原料，for x in nums 是传送带把每个 x 依次送进机器，x * 2 是机器干的活，最外面的 [] 负责把成品一个一个收进筐里。加个 if？那就是在机器前装了道<b>安检门</b>，不合格的直接被拦下。",
+  lineNotes:[
+   [`nums = [3, 8, 5, 12, 7]`, "传送带上的 5 件原料"],
+   [`doubled = [x * 2 for x in nums]`, "每个都过一遍 ×2 机器：5 个进、5 个出，收集成新列表"],
+   [`big = [x for x in nums if x >= 7]`, "装上安检门：只放行 ≥7 的，3 和 5 被拦下"],
+   [`print("总和:", sum(nums), ...)`, "统计四兄弟一次全出场：sum 求和、max 最大、len 数个数"]],
+  tryThis:[
+   "把 x * 2 改成 x * x（平方），想想输出会变成什么再验证",
+   "if 条件改成 x < 5，想想谁会被放行",
+   "挑战：筛出所有偶数（提示：x % 2 == 0，% 是取余数）"],
+  example:{input:"", code:`nums = [3, 8, 5, 12, 7]
+
+doubled = [x * 2 for x in nums]
+print("翻倍:", doubled)
+
+big = [x for x in nums if x >= 7]
+print("大于等于7的:", big)
+
+print("总和:", sum(nums), "最大:", max(nums), "个数:", len(nums))`},
+  tip:"「平均分」就是 sum(nums) / len(nums) —— 全部加起来，除以个数。练习里会用到。"},
+
+ {type:"exercise", id:"E1", deliver:true, title:"练习：成绩统计器",
+  mascot:"第一个<b>交付物</b>来了！做完这个，你就是「有作品」的程序员了，做完记得拿去给爸妈演示。",
+  task:[
+   "从输入里读入 <b>10 个</b>成绩（每行一个），然后输出：",
+   "最高分、最低分、平均分（除法结果是带小数的，直接输出就行）、及格人数（≥60 分）。",
+   "输出格式必须和「期望输出」一模一样，判题才认。"],
+  steps:[
+   "第一行已经帮你写好了：10 个成绩已经装进列表 <b>scores</b>。",
+   "最高分、最低分、平均分，各是一个 print：max(scores)、min(scores)、sum(scores) / len(scores)。",
+   "及格人数是「先筛再数」：len([s for s in scores if s >= 60])。",
+   "检查输出文字：要和期望输出一字不差，包括冒号后面那个空格。"],
+  input:"78\n92\n45\n66\n88\n59\n100\n73\n81\n90\n",
+  expected:`最高分: 100
+最低分: 45
+平均分: 77.2
+及格人数: 8`,
+  starter:`scores = [int(input()) for _ in range(10)]
+# 第一行已经帮你写好：读入10个成绩，存成列表 scores
+# 现在轮到你：
+#   最高分用 max(scores)
+#   最低分用 min(scores)
+#   平均分用 sum(scores) / len(scores)
+#   及格人数：想想怎么「数出」>=60 的个数（提示：列表推导式 + len）
+
+`, hint:"及格人数 = len([s for s in scores if s >= 60])。这是「先筛再数」两步合一。",
+  answer:`scores = [int(input()) for _ in range(10)]
+print("最高分:", max(scores))
+print("最低分:", min(scores))
+print("平均分:", sum(scores) / len(scores))
+print("及格人数:", len([s for s in scores if s >= 60]))`},
+
+ {type:"exercise", id:"E2", deliver:false, title:"练习：单词切片",
+  mascot:"切单词！python 这个词今天会被你切成四块，先在心里给每个字母编号再动手。",
+  task:[
+   "读入一个英文单词（比如 python），按顺序输出：第一个字母、最后一个字母、第 2 到第 4 个字母、倒过来的整个单词。",
+   "记住：编号从 <b>0</b> 开始；<b>w[-1]</b> 是最后一个；<b>w[1:4]</b> 取编号 1、2、3（不含 4）；<b>w[::-1]</b> 整个倒过来。"],
+  steps:[
+   "先在心里给 python 编号：p₀ y₁ t₂ h₃ o₄ n₅。",
+   "四个 print，每个一行：w[0]、w[-1]、w[1:4]、w[::-1]。",
+   "w[1:4] 是编号 1、2、3 → y t h。<b>含头不含尾</b>，编号 4 的 o 不算。"],
+  input:"python\n",
+  expected:`p
+n
+yth
+nohtyp`,
+  starter:`w = input()
+# w[0] 第一个字母, w[-1] 最后一个
+# w[1:4] 切出一段, w[::-1] 倒过来
+# 把这四个都用 print 输出，每行一个
+
+`, hint:"四个 print，每个一行。注意 w[1:4] 不包含编号 4 的字母。",
+  answer:`w = input()
+print(w[0])
+print(w[-1])
+print(w[1:4])
+print(w[::-1])`},
+
+ {type:"lab", id:"LAB7", title:"动画实验室：把成绩画成柱状图",
+  mascot:"你刚学会了<b>列表</b>，现在让它画出图来！这个月的成绩统计器算出数字，这里的实验室把数字变成图——数据一变，图就跟着变。",
+  intro:[
+   "用到的命令：<b>画方块(x, y, 宽, 高)</b>——(x, y) 是方块<b>左上角</b>的位置；<b>写字(x, y, \"文字\")</b> 在画布上写下文字，y 是文字<b>底部</b>的大概位置。",
+   "柱状图的做法：柱子 x 往右排，柱子高度 = 分数 × 一个倍数；柱子的 y = 底线 − 高度。这句是整个图的核心。",
+   "for i in range(5) 里用 <b>scores[i]</b> 和 <b>names[i]</b> 就能一次拿到第 i 个人的分数和名字——这就是上节课学的「按编号取元素」。"],
+  starter:`# 把五个同学的分数画成柱状图
+scores = [90, 75, 60, 85, 45]
+names  = ["小明", "小红", "小刚", "小丽", "小华"]
+
+for i in range(5):
+    h = scores[i] * 2            # 1 分 = 2 像素高
+    变色("tomato" if scores[i] >= 60 else "gray")
+    画方块(30 + i * 72, 280 - h, 50, h)
+    变色("#1A1D21")
+    写字(30 + i * 72, 288, names[i])`,
+  tip:"改一下 scores 里的数字，图立刻跟着变——这叫「数据驱动画面」，所有图表软件都是这么做的。",
+  tryThis:[
+   "把小华的 45 改成 100，看图怎么变",
+   "把变色那行的 60 改成 90：只有 90 分以上才是红色",
+   "挑战：柱子从矮到高排队——把 scores 换成 sorted(scores) 再想想 names 怎么办"],
+  tip2:"画方块左上角是 (x, y)，所以柱子 y 要用 280 − h 往上顶——想想为什么不能直接写 y = 280。"},
+]},
+
+{lv:"Lv.8", month:"第 2 月", name:"多数据结构与逻辑转换", items:[
+ {type:"lesson", id:"L8-1", title:"字典：一本真正的词典",
+  mascot:"今天认识一个超能力：<b>报名字，一步取货</b>，不用排队翻页。用过的都说好。",
+  intro:[
+   "字典长这样：<b>{\"apple\": \"苹果\"}</b>，冒号前面是<b>键</b>，后面是<b>值</b>。",
+   "存进去：<b>book[\"cat\"] = \"猫\"</b>；查出来：<b>book[\"cat\"]</b>。",
+   "查有没有这一页，用 <b>in</b>：\"cat\" in book 会回答 True 或 False。",
+   "字典最擅长的事：不用翻页，一步直达。"],
+  analogy:"字典像学校的<b>储物柜</b>：柜号（键）是唯一的，一格柜子放一组东西；报出柜号一步到位。对比一下：列表像<b>排队报数</b>（「第 3 个是谁？」要一个个数过去），字典像<b>喊名字</b>（喊到谁谁答应）。东西一多，喊名字的速度优势就出来了。",
+  lineNotes:[
+   [`book = {"apple": "苹果", "banana": "香蕉"}`, "开局自带两页的词典：冒号前是<b>键</b>（柜号），后面是<b>值</b>（柜子里的东西）"],
+   [`book["cat"] = "猫"`, "新增一页。如果 cat 这个键已经存在，旧释义会被<b>覆盖</b>"],
+   [`print(book["apple"])`, "报柜号直接取东西，一步到位"],
+   [`"banana" in book`, "只回答「有没有」：True 或 False，不把值拿出来"]],
+  tryThis:[
+   "再写一行 book[\"apple\"] = \"apple 苹果\"，看看原来那页会怎样",
+   "试试 print(book.get(\"dog\", \"查无此词\"))——get 能带一个「查不到就给这个」的备用答案",
+   "用 len(book) 数一数词典现在有多厚"],
+  example:{input:"", code:`book = {"apple": "苹果", "banana": "香蕉"}
+book["cat"] = "猫"
+
+print(book["apple"])
+print("有 banana 吗:", "banana" in book)
+print("有 dog 吗:", "dog" in book)
+print("一共", len(book), "个词")`},
+  tip:"字典里同一个键只能有一个值——再 add 一次「apple」，旧释义会被新的覆盖。练习 3 会用到这一点。"},
+
+ {type:"lesson", id:"L8-2", title:"集合：自动去重的魔法筐",
+  mascot:"有个筐会<b>自动帮你去重</b>——懒人福音！但它的记性有点特别，往下看。",
+  intro:[
+   "<b>set</b> 是一个「不许重复」的筐：扔进去 1、2、2、3，拿出来只有 1、2、3。",
+   "两个筐的<b>共同部分</b>：a & b（交集）；<b>只在 a 有</b>的：a - b（差集）。",
+   "集合没有顺序，想要排好序的列表：外面套一个 <b>sorted()</b>。"],
+  analogy:"set 像一个有<b>门卫</b>的筐：门卫只记「来过没有」，同一张脸来八次也只登记一次。但门卫有个怪癖——<b>记不住先来后到</b>，所以他筐里的东西是乱序的。想让它们排队？请 sorted() 姐姐帮忙。",
+  lineNotes:[
+   [`print("去重:", set(a))`, "6 个进、3 个出：门卫只记「来过没有」，重复的全被拦下"],
+   [`print("共同有:", x & y)`, "& 是交集：两个筐<b>都</b>有的"],
+   [`print("只有x有:", x - y)`, "- 是差集：只在 x 有、y 没有的"],
+   [`print("排好序:", sorted(set(a)))`, "门卫的筐是乱序的，sorted() 帮它从小到大排好队"]],
+  tryThis:[
+   "把 & 换成 |（并集：两筐合一起全保留），比较结果",
+   "试试 set(\"banana\")，猜猜最后剩哪几个字母",
+   "把 x - y 换成 y - x，结果一样吗？为什么？"],
+  example:{input:"", code:`a = [1, 2, 2, 3, 3, 3]
+print("去重:", set(a))
+
+x = {1, 2, 3}
+y = {2, 3, 4}
+print("共同有:", x & y)
+print("只有x有:", x - y)
+print("排好序:", sorted(set(a)))`},
+  tip:"set(a) 的结果长成 {1, 2, 3} 的样子，它不是列表。sorted() 之后才变回列表 [1, 2, 3]。"},
+
+ {type:"exercise", id:"E3", deliver:true, title:"练习：单词本程序",
+  mascot:"做个<b>自己的单词本</b>！正好把你英语分级读物里的生词收进去。",
+  task:[
+   "做一个迷你单词本。程序会收到 5 行命令，每行用空格隔开：",
+   "<b>add 单词 释义</b> —— 收录进字典（重复 add 同一个词，新释义覆盖旧的，这不算错）；",
+   "<b>query 单词</b> —— 查到了输出「单词 = 释义」，查不到输出「没有这个词」。", 
+   "5 行处理完之后，输出「共收录 N 个单词」。"],
+  steps:[
+   "循环 5 次，每次 line = input().split()，把一行切成三段（query 是两段）。",
+   "看 line[0] 是什么命令：add 就存 book[line[1]] = line[2]。",
+   "query 要先判断：line[1] in book 在就打印，不在就打印「没有这个词」。",
+   "循环外面最后一步：print(\"共收录\", len(book), \"个单词\")。"],
+  input:"add apple 苹果\nadd banana 香蕉\nadd cat 猫\nquery apple\nquery dog\n",
+  expected:`apple = 苹果
+没有这个词
+共收录 3 个单词`,
+  starter:`book = {}
+for _ in range(5):
+    line = input().split()
+    cmd = line[0]      # 命令：add 或 query
+    # line[1] 是单词；add 时 line[2] 是释义
+    # add：存进 book
+    # query：在就打印 "单词 = 释义"，不在就打印 没有这个词
+
+# 循环结束后，打印一共收录了几个单词
+
+`, hint:"打印「单词 = 释义」可以直接 print(line[1], \"=\", book[line[1]])。收录数量用 len(book)。",
+  answer:`book = {}
+for _ in range(5):
+    line = input().split()
+    cmd = line[0]
+    if cmd == "add":
+        book[line[1]] = line[2]
+    elif cmd == "query":
+        if line[1] in book:
+            print(line[1], "=", book[line[1]])
+        else:
+            print("没有这个词")
+print("共收录", len(book), "个单词")`},
+
+ {type:"exercise", id:"E4", deliver:false, title:"练习：去重与交集",
+  mascot:"小练习，5 分钟拿下，稳住。三行 print 而已。",
+  task:[
+   "第一行输入是一串数字（空格隔开）。输出三行：原列表、去重并从小到大排好、以及 {1,2,3} 和 {2,3,4} 的交集。",
+   "交集已经帮你定好了是这两个集合，你的任务是正确使用 set、sorted 和 &。"],
+  steps:[
+   "第一行已帮你写好：nums 是数字列表。",
+   "原列表直接 print(nums)。",
+   "去重排序：sorted(set(nums))。",
+   "交集：sorted({1, 2, 3} & {2, 3, 4})。"],
+  input:"3 1 2 3 3 2\n",
+  expected:`原列表: [3, 1, 2, 3, 3, 2]
+去重后: [1, 2, 3]
+交集: [2, 3]`,
+  starter:`nums = [int(x) for x in input().split()]
+# 原列表直接 print(nums)
+# 去重后：sorted(set(nums))
+# 交集：sorted({1,2,3} & {2,3,4})
+
+`, hint:"三行都是 print。第二行 print(\"去重后:\", sorted(set(nums)))。",
+  answer:`nums = [int(x) for x in input().split()]
+print("原列表:", nums)
+print("去重后:", sorted(set(nums)))
+print("交集:", sorted({1, 2, 3} & {2, 3, 4}))`},
+
+ {type:"lab", id:"LAB8", title:"动画实验室：用字典画单词卡片墙",
+  mascot:"字典不只能查单词，还能<b>指挥画画</b>！你刚做完「单词本」交付物，现在把单词直接画成一整面墙的卡片。",
+  intro:[
+   "这里用到了：<b>for word in cards</b> 会依次拿到字典里的每个「钥匙」，<b>cards[word]</b> 就是钥匙对应的「盒子里的东西」。",
+   "<b>写字(x, y, word)</b> 把单词写在卡片上；<b>画方块(x, y, 80, 80)</b> 画一张卡片。变色用字典里存的颜色名。",
+   "变量 x 记录「下一张卡片画在哪」：每画完一张，x = x + 92 往右挪一格——这个套路叫<b>游标</b>，以后到处都用。"],
+  starter:`# 字典：单词 → 卡片颜色
+cards = {
+    "apple":  "tomato",
+    "banana": "goldenrod",
+    "cat":    "seagreen",
+    "dog":    "cornflowerblue",
+}
+
+x = 20
+for word in cards:
+    变色(cards[word])          # 用字典里的颜色画卡片
+    画方块(x, 110, 80, 80)
+    变色("#ffffff")            # 换白色写字
+    写字(x + 14, 155, word)    # 卡片中间写单词
+    x = x + 92                 # 游标右移，准备下一张`,
+  tip:"for word in cards 拿到的是钥匙，cards[word] 才是盒子里的东西——卡片墙的颜色全部来自字典，代码里没有一处写死颜色。",
+  tryThis:[
+   "加一张自己的卡片：往字典里加 \"egg\" 和你喜欢的颜色",
+   "换成你英语分级读物里正在读的生词",
+   "挑战：只画带字母 a 的单词——在循环里加 if \"a\" in word:，注意缩进"],
+  tip2:"字典的顺序就是往里放的顺序。试试把 apple 和 cat 换个位置，卡片墙会跟着换位置。"},
+]},
+
+{lv:"Lv.9", month:"第 3 月", name:"循环控制与枚举思维", items:[
+ {type:"lesson", id:"L9-1", title:"break 和 continue：两个紧急按钮",
+  mascot:"循环的两个<b>紧急按钮</b>——游戏里天天用。分清这两个，你的循环就听话了。",
+  intro:[
+   "<b>continue</b>：「这一轮不玩了」，直接跳到下一轮循环。",
+   "<b>break</b>：「整个循环下班」，直接跳出，后面的轮次都不跑了。",
+   "这两个按钮只在循环里才有意义，写在外面会报错。"],
+  analogy:"循环像<b>绕操场跑圈</b>：continue 是「这圈算了，直接进下一圈」，break 是「不跑了，回教室」。要是没有这两个按钮，你只能傻乎乎跑满全部圈数。猜数字游戏全靠它们：没猜中就继续跑，猜中了 break 收工。",
+  lineNotes:[
+   [`for n in [1, 2, 3, 4, 5]:`, "一圈一个数，共五圈"],
+   [`    if n == 3:`, "n 是 3 时喊「continue 这圈跳过」，下面的 print 根本没执行"],
+   [`    if n == 5:`, "n 是 5 时喊「break 下班」，循环直接结束"],
+   [`    print(n)`, "所以最后只打印出 1、2、4 三个数"]],
+  tryThis:[
+   "把 continue 改成 break，输出差在哪？",
+   "把列表里的 5 改成 6，break 还会发生吗？",
+   "在 print(n) 后面加一行 print(\"走你\")，数数它一共出现几次"],
+  example:{input:"", code:`for n in [1, 2, 3, 4, 5]:
+    if n == 3:
+        continue      # 3 被跳过了
+    if n == 5:
+        break         # 到 5 整个循环结束
+    print(n)
+print("循环结束")`},
+  tip:"猜数字游戏全靠这两个按钮：没猜中就 continue 下一轮（其实是继续循环），猜中了 break 收工。"},
+
+ {type:"lesson", id:"L9-2", title:"枚举法：笨办法，大智慧",
+  mascot:"<b>笨办法拯救世界</b>！计算机最擅长的就是「挨个试」——试得飞快。",
+  intro:[
+   "枚举 = <b>一个一个试</b>。听着笨，但它能解决很多「聪明办法」解决不了的问题，鸡兔同笼就是它的主场。",
+   "套路三步：<b>① 圈定范围</b>（for n in range(...)）→ <b>② 逐个检验</b>（if 条件）→ <b>③ 命中处理</b>。",
+   "for 循环还配一个特别的 <b>else</b>：循环全程没被 break 打断时，才会执行。正好用来表达「一个都没试出来」。"],
+  analogy:"枚举像<b>开一整面墙的盲盒</b>：从 1 号挨个捏到 20 号，捏到「对」的那个为止。数学考试要巧算，写程序可以理直气壮地挨个试——因为计算机一秒能捏几百万个。这招在比赛里有个正经名字，叫「暴力枚举」，是正经的得分技术。",
+  lineNotes:[
+   [`for n in range(1, 21):`, "把 1~20 号「盲盒」排成一排，挨个试"],
+   [`    if 20 % n == 0:`, "捏的方法：% 取余数，余 0 说明整除，n 就是因数"],
+   [`        print(...)`, "命中的登记一下，然后继续试下一个"]],
+  tryThis:[
+   "把 20 换成 24，先猜因数有哪些，再运行验证",
+   "挑战：打印 1~100 里所有 7 的倍数",
+   "试试条件 n % 7 == 3：余数是 3 的数有哪些？"],
+  example:{input:"", code:`# 找出 20 的所有因数：从 1 试到 20
+for n in range(1, 21):
+    if 20 % n == 0:
+        print(n, "是 20 的因数")`},
+  tip:"% 是取余数：20 % 6 == 2。余数为 0，说明整除。"},
+
+ {type:"exercise", id:"E5", deliver:true, title:"练习：鸡兔同笼求解器",
+  mascot:"<b>千年老题</b>鸡兔同笼，今天让计算机替你数！数学课上要巧算，这里光明正大地枚举。",
+  task:[
+   "输入两行：第一行是<b>头的总数</b>，第二行是<b>脚的总数</b>。用枚举法解出鸡兔各几只。",
+   "思路：假设鸡有 c 只，兔就有 heads − c 只；检验「鸡脚 + 兔脚 == 总脚数」。",
+   "c 从 0 试到 heads，命中就输出并 break；一个都没命中（for-else）输出「无解」。"],
+  steps:[
+   "读入 heads、feet 两个数。",
+   "for c in range(heads + 1)：c 是鸡的只数，兔永远是 r = heads - c。",
+   "检验 c * 2 + r * 4 == feet：命中就 print 并 break。",
+   "for-else 输出「无解」。自测一下：如果 feet 是奇数（比如 27），是不是必然无解？"],
+  input:"10\n28\n",
+  expected:`鸡: 6 兔: 4`,
+  starter:`heads = int(input())
+feet = int(input())
+# 枚举鸡的数量 c：0 到 heads
+# 兔 = heads - c
+# 如果 c*2 + 兔*4 == feet：打印 鸡: c 兔: r，然后 break
+# 全部试完都没中（for-else）：打印 无解
+
+`, hint:"for c in range(heads + 1): 先算 rabbit = heads - c，再检验脚数。print(\"鸡:\", c, \"兔:\", rabbit)。",
+  answer:`heads = int(input())
+feet = int(input())
+for c in range(heads + 1):
+    r = heads - c
+    if c * 2 + r * 4 == feet:
+        print("鸡:", c, "兔:", r)
+        break
+else:
+    print("无解")`},
+
+ {type:"exercise", id:"E6", deliver:false, title:"练习：猜数字",
+  mascot: "你第一个「<b>无限循环</b>」程序！小心，忘了 break 它就永远停不下来",
+  task:[
+   "答案藏在程序里（42）。玩家每行输入一个猜测，程序回应「大了」「小了」，直到猜中输出「猜对了！」并停机。",
+   "这是你第一个 while True 无限循环 + break 的程序。"],
+  steps:[
+   "while True 是「永远循环」，停下来的唯一办法是里面的 break。",
+   "每轮先 guess = int(input())。",
+   "三个分支：猜对打印「猜对了！」并 break；太大打印「大了」；否则打印「小了」。",
+   "想一下：如果猜对了但忘了写 break，会发生什么？"],
+  input:"50\n30\n42\n",
+  expected:`大了
+小了
+猜对了！`,
+  starter:`answer = 42
+while True:
+    guess = int(input())
+    # 猜对：打印 猜对了！ 并 break
+    # 太大：打印 大了
+    # 太小：打印 小了
+
+`, hint:"三个分支 if / elif / else，猜对的那支里记得 break，不然循环停不下来。",
+  answer:`answer = 42
+while True:
+    guess = int(input())
+    if guess == answer:
+        print("猜对了！")
+        break
+    elif guess > answer:
+        print("大了")
+    else:
+        print("小了")`},
+
+ {type:"lab", id:"LAB9", title:"动画实验室：循环画出彩虹螺旋",
+  mascot:"这个月学了 <b>for 和 while</b>，现在让循环干一件漂亮事：画一条越转越大的<b>彩虹螺旋</b>。改一个数字，图案就完全不同。",
+  intro:[
+   "核心只有四行循环体：<b>变色 → 前进 → 右转 → 变长</b>。每转 89 度（不是 90！），直线就慢慢扭成螺旋。",
+   "<b>colors[i % 6]</b>：i % 6 的结果永远在 0 到 5 之间打转，正好当颜色编号——这是「取余」最经典的用法。",
+   "length = length + 5 让边一圈比一圈长，螺旋才能张开。这三个小技巧组合起来，就是全部秘密。"],
+  starter:`# 彩虹螺旋：一圈比一圈大
+colors = ["tomato", "orange", "goldenrod",
+          "seagreen", "cornflowerblue", "purple"]
+
+跳到(200, 150)
+length = 4
+for i in range(26):
+    变色(colors[i % 6])
+    前进(length)
+    右转(89)              # 就差这 1 度，直线变螺旋
+    length = length + 5`,
+  tip:"右转(89) 的 89 是整幅画的灵魂：改成 90 就是叠在一起的正方形，改成 121、144 又是完全不同的图案。改一改，运行，看惊喜。",
+  tryThis:[
+   "把 右转(89) 改成 右转(90)，看看和 89 差在哪",
+   "改成 右转(121) 和 右转(144)，各画出什么图案？",
+   "把 range(26) 改成 range(40)、length 每次加 2——螺旋更密更细（注意别超过画面）"],
+  tip2:"colors[i % 6] 里的 6 是颜色个数。你往 colors 里加一个颜色，记得把 6 改成 7。"},
+]},
+
+{lv:"Lv.10", month:"第 4 月", name:"二维列表与硬件实践", items:[
+ {type:"lesson", id:"L10-1", title:"列表里放列表：表格出现了",
+  mascot:"<b>表格出现啦</b>！井字棋、扫雷、地图，全都是这一招。",
+  intro:[
+   "列表的元素还可以是列表：<b>grid = [[1,2,3],[4,5,6]]</b>，这就是一张 2 行 3 列的表格。",
+   "取值要两个编号：<b>grid[行][列]</b>，都是从 0 数起。grid[1][2] 是第 2 行第 3 个。",
+   "遍历整张表：外层 for 拿到「一行」，内层 for 拿到「一行里的一个」。"],
+  analogy:"二维列表像<b>电影院的座位表</b>：先说第几排，再说这一排的第几个座位。grid[1][2] 就是「第 2 排第 3 座」。注意：报座位永远<b>先排后座</b>（先行后列），而且程序数数从 0 开始——第 2 排其实是 grid[1]。",
+  lineNotes:[
+   [`grid = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]`, "三个小列表装进大列表 = 一张 3 行 3 列的座位表"],
+   [`print("第2行第3个:", grid[1][2])`, "先<b>行</b>后<b>列</b>，都从 0 数起：grid[1] 是第 2 行，[2] 是这行第 3 个"],
+   [`for row in grid:`, "外层循环一次拿到「一整行」"],
+   [`print("对角线:", grid[0][0], ...)`, "左上到右下的对角线有个规律：行号 = 列号"]],
+  tryThis:[
+   "把 grid 改成 2 行 4 列，改改看",
+   "先说出 grid[2][0] 是几，再运行验证",
+   "试试 grid[1][1] + grid[0][2] 等于几"],
+  example:{input:"", code:`grid = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+]
+print("第2行第3个:", grid[1][2])
+for row in grid:
+    print(row)
+print("对角线:", grid[0][0], grid[1][1], grid[2][2])`},
+  tip:"井字棋、棋盘、地图，本质都是二维列表。练习 7 就是要你亲手造一张。"},
+
+ {type:"lesson", id:"L10-2", title:"坐标：程序世界的位置",
+  mascot:"记住一条铁律：<b>程序数数从 0 开始</b>！全世界程序员都在这掉过坑，你先知道就赢了一半。",
+  intro:[
+   "「第几行第几列」和「x、y 坐标」是一回事，只是数数的方式不同：<b>人从 1 数起，程序从 0 数起</b>。",
+   "所以「第 2 行」在程序里是编号 1。转换公式：编号 = 第几个 − 1。",
+   "建一张 3×3 空棋盘：<b>[[\" \"] * 3 for _ in range(3)]</b>，然后往指定坐标放棋子。"],
+  analogy:"人和程序数数的差别，像<b>电梯楼层</b>：你按「3 层」，中国 elevator 显示 3，但很多国家的电梯里它是按钮 2（因为底层是 0）。以后你写代码时心里要一直装着这个 −1：嘴里说的「第几个」，到程序里编号都要减 1。",
+  lineNotes:[
+   [`board = [[" "] * 3 for _ in range(3)]`, "3 行、每行 3 个空格 = 空棋盘。注意这是推导式建表，不是 [[\" \"]*3]*3"],
+   [`board[1][1] = "X"`, "正中间。想想：为什么不是 board[2][2]？"],
+   [`board[0][2] = "O"`, "第 1 行第 3 个——「第 3 个」在程序里是编号 2"],
+   [`print("|".join(row))`, "把一行三个棋子用竖线连起来，看起来才像棋盘"]],
+  tryThis:[
+   "把 X 放到左上角，该写哪个坐标？",
+   "挑战：把两条对角线都放满 X（三条语句搞定主对角线）",
+   "试试把棋盘变成 4×4"],
+  example:{input:"", code:`board = [[" "] * 3 for _ in range(3)]
+board[1][1] = "X"    # 正中间
+board[0][2] = "O"    # 第 1 行第 3 个
+for row in board:
+    print("|".join(row))`},
+  tip:"\"|\".join(row) 把一行里的三个棋子用竖线连成一个字符串，看起来才像棋盘。"},
+
+ {type:"lab", id:"LAB1", title:"动画实验室：海龟画图与坐标",
+  mascot:"欢迎来到<b>动画实验室</b>！这里的命令是中文的——让它画个正方形热热身，再挑战五角星，最后试试让小球跑起来。",
+  intro:[
+   "这里的命令是中文的：<b>前进(100)</b> 向前爬 100 步，<b>右转(90)</b> 原地转 90 度，<b>左转</b>同理。",
+   "<b>变色(\"red\")</b> 换画笔颜色；<b>抬笔()/落笔()</b> 控制走的时候画不画线；<b>跳到(x, y)</b> 瞬间移动——左上角是 (0, 0)，右下角是 (400, 300)。",
+   "<b>画圆(x, y, r)</b> 和 <b>画方块(x, y, 宽, 高)</b> 直接画图形；<b>清空()</b> 全部擦掉；<b>等待(毫秒)</b> 停一停——配合 while 循环就是动画。",
+   "画正多边形的秘诀：画 n 条边，每次右转 <b>360 ÷ n</b> 度。三角形 120 度，正方形 90 度。"],
+  example:{input:"", code:`# 1. 画一个正方形
+变色("tomato")
+for i in range(4):
+    前进(120)
+    右转(90)
+
+# 2. 跳到别处，画一个圆
+跳到(90, 250)
+变色("seagreen")
+画圆(90, 250, 22)`},
+  tip:"五角星的秘密：画 5 条边、每画一条右转 144 度——144 = 360 × 2 ÷ 5。用 range(5) 试试。",
+  tryThis:[
+   "画三角形：右转(90) 改成 右转(120)，range(4) 改成 range(3)",
+   "挑战五角星：前进(150)、右转(144)、range(5)",
+   "挑战小房子：先画正方形，再抬笔() 跳到屋顶位置，落笔画个三角形",
+   "挑战动画：让一个圆从左滚到右——while 循环里 清空() → 画圆(x, 150, 12) → 等待(30) → x 每次加 8"],
+  starter:`# 画一个正方形
+变色("tomato")
+for i in range(4):
+    前进(120)
+    右转(90)
+
+# 跳到别处，画一个圆
+跳到(90, 250)
+变色("seagreen")
+画圆(90, 250, 22)`,
+  tip2:"写 while True 动画时记得留一个结束条件，或者随时按「停止」按钮。"},
+
+ {type:"exercise", id:"E7", deliver:true, title:"练习：井字棋棋盘",
+  mascot:"亲手造一张<b>井字棋棋盘</b>！做完可以跟同学吹一波：你的程序会判胜负。",
+  task:[
+   "读入 3 行，每行 3 个棋子（X、O 或空格隔开），构成棋盘。",
+   "先用 | 和 ----- 把棋盘画出来（照着期望输出的样子），再检查<b>主对角线</b>三格：相同则输出「X 赢了」或「O 赢了」，否则「还没分出胜负」。"],
+  steps:[
+   "第一行已帮你写好：board 是 3×3 棋盘。",
+   "画棋盘：每个 row 打印 \"|\".join(row)，再打印 \"-----\"。",
+   "主对角线三格：board[0][0]、board[1][1]、board[2][2]。",
+   "三个相等可以写 diag[0] == diag[1] == diag[2]，Python 允许连着比。"],
+  input:"X O X\nO X O\nO X X\n",
+  expected:`X|O|X
+-----
+O|X|O
+-----
+O|X|X
+-----
+X 赢了`,
+  starter:`board = [input().split() for _ in range(3)]
+# 1. 画棋盘：每行用 "|".join(row) 打印，行间打印 "-----"
+# 2. 检查主对角线 board[0][0], board[1][1], board[2][2]
+#    三个相等 → 打印 棋子 + " 赢了"，否则 → 还没分出胜负
+
+`, hint:"三个相等可以写 if diag[0] == diag[1] == diag[2]，Python 允许连着比较。",
+  answer:`board = [input().split() for _ in range(3)]
+for row in board:
+    print("|".join(row))
+    print("-----")
+diag = [board[0][0], board[1][1], board[2][2]]
+if diag[0] == diag[1] == diag[2]:
+    print(diag[0], "赢了")
+else:
+    print("还没分出胜负")`},
+
+ {type:"exercise", id:"E8", deliver:false, title:"练习：矩阵找最大",
+  mascot:"9 个数字里<b>找老大</b>，两层循环安排上。想想「擂台赛」怎么打。",
+  task:[
+   "读入 3 行、每行 3 个数的矩阵，找到最大的数在第几行第几列（<b>从 1 数起</b>）。"],
+  steps:[
+   "第一行已帮你写好：grid 是 3×3 数字表。",
+   "擂台思路：先假设 grid[0][0] 是擂主（biggest），pr、pc 记住它的位置。",
+   "两层 for 挨个挑战：谁比擂主大，谁就当擂主，同时更新 pr、pc。",
+   "输出位置记得 +1：程序里的编号 0，对人来说是「第 1」。"],
+  input:"3 8 1\n4 9 2\n7 6 5\n",
+  expected:`最大数: 9
+位置: 第 2 行 第 2 列`,
+  starter:`grid = [[int(x) for x in input().split()] for _ in range(3)]
+# 两层 for 遍历，用 if 找最大，同时记住行列编号
+# 输出位置时编号要 +1（第 1 行从 1 数起）
+
+`, hint:"先假设 grid[0][0] 最大，再逐个比较替换。print(\"位置: 第\", pr + 1, \"行 第\", pc + 1, \"列\")。",
+  answer:`grid = [[int(x) for x in input().split()] for _ in range(3)]
+biggest = grid[0][0]
+pr = 0
+pc = 0
+for i in range(3):
+    for j in range(3):
+        if grid[i][j] > biggest:
+            biggest = grid[i][j]
+            pr, pc = i, j
+print("最大数:", biggest)
+print("位置: 第", pr + 1, "行 第", pc + 1, "列")`},
+]},
+
+{lv:"Lv.11", month:"第 5 月", name:"函数与结构化编程", items:[
+ {type:"lesson", id:"L11-1", title:"函数：给一段本领起个名字",
+  mascot:"函数 = <b>造一台机器</b>，造一次天天用。程序员都是「偷懒」高手——懒出效率的那种。",
+  intro:[
+   "<b>def 函数名(参数):</b> 下面缩进的代码就是它的本领。起好名字，随时 <b>函数名()</b> 召唤。",
+   "参数是「进门时带的行李」：say_hello(\"小明\") 把 \"小明\" 传给 name。",
+   "写函数最大的好处：<b>同一段本事，写一次，到处用</b>。"],
+  analogy:"函数像<b>榨汁机</b>：水果（参数）放进去，果汁（结果）出来。机器买一次（def 定义一次），天天用（调用无数次）——你不会每次榨汁都重新造一台机器吧？没有函数的话，那行代码就得复制三遍，改一个字就要改三处，漏一处就出 bug。",
+  lineNotes:[
+   [`def say_hello(name):`, "def 是「定义」。这行给本领起名，括号里的 name 是进门带的行李"],
+   [`    print("你好,", name, "!")`, "<b>缩进的这两行是它的本领</b>——不缩进的代码就不归它管了"],
+   [`say_hello("小明")`, "召唤一次，打招呼一次。召唤三次，打招呼三次"]],
+  tryThis:[
+   "再加一行 say_hello(\"你自己的名字\")",
+   "挑战：新写一个 def say_bye(name)，让它说再见",
+   "想想：print(\"你好\") 直接写在函数外面（不缩进），会什么时候执行？"],
+  example:{input:"", code:`def say_hello(name):
+    print("你好,", name, "!")
+
+say_hello("小明")
+say_hello("奶奶")
+say_hello("Python")`},
+  tip:"召唤三次，它就打招呼三次。要是没有函数，你得把那行 print 复制三遍——改一个字就要改三处。"},
+
+ {type:"lesson", id:"L11-2", title:"return：函数把结果交回来",
+  mascot:"print 和 return 的区别，<b>很多大人都搞不清</b>——你今天搞清，就超过他们了。",
+  intro:[
+   "print 是「展示给用户看」，<b>return 是「把结果交回给程序」</b>——交回来才能继续算。",
+   "result = add(3, 5) 之后，result 就等于 8，还能再拿去参加别的运算。",
+   "一个只 print 不 return 的函数，像一台只吐图不交货的机器。"],
+  analogy:"print 是老师把批好的卷子<b>举起来展示</b>：全班都看到了，但谁也拿不走。return 是老师<b>把卷子发还给你</b>：你拿到手里，才能拿它去做下一件事（订正、贴到错题本、给家长签字）。程序里的「下一件事」，就是把结果接着拿去算别的。",
+  lineNotes:[
+   [`def add(a, b):`, "两个参数的机器：放进去两个数"],
+   [`    return a + b`, "return 把结果<b>交回</b>给调用它的地方，而不是只展示一下"],
+   [`result = add(3, 5)`, "交回来的 8 存进 result，后面还能接着用"],
+   [`print("再 + 10 =", add(result, 10))`, "机器的产物还能再喂回机器——这就是 return 的威力"]],
+  tryThis:[
+   "把 add 改成三个参数 a, b, c，返回三数之和",
+   "挑战：写一个 minus(a, b) 返回差",
+   "试试 result = add(add(1, 2), add(3, 4))，先猜答案再验证"],
+  example:{input:"", code:`def add(a, b):
+    return a + b
+
+result = add(3, 5)
+print("3 + 5 =", result)
+print("再 + 10 =", add(result, 10))`},
+  tip:"练习 9 会让你写两个函数：一个负责判断（return True/False），一个负责分级（return 文字）。"},
+
+ {type:"exercise", id:"E9", deliver:true, title:"练习：成绩函数（重构）",
+  mascot:"<b>重构</b>！听着很高级，其实就是「把代码变整齐」——这是程序员每天真正的日常工作。",
+  task:[
+   "is_pass 已经写好了：判断及格。你要补一个 <b>grade(score)</b> 函数，把分数变成等级。",
+   "规则：≥90 优秀、≥75 良好、≥60 及格、否则不及格。return 的是文字，不是 print。",
+   "这就是「重构」的起点：把判断逻辑装进函数，主程序只剩下调用。"],
+  steps:[
+   "is_pass 别动，照抄它的样子写：def grade(score):。",
+   "里面 if / elif / elif / else 四个分支，从 90 往下判。",
+   "每个分支 <b>return</b> 一个词，千万别写成 print。",
+   "最后两行主程序已经写好，不用动——函数写对了它们自然能跑。"],
+  input:"85\n",
+  expected:`及格了吗: True
+等级: 良好`,
+  starter:`def is_pass(score):
+    return score >= 60
+
+# 在这里写 grade(score) 函数：
+# >=90 优秀  >=75 良好  >=60 及格  否则 不及格
+# 注意用 return，不是 print
+
+s = int(input())
+print("及格了吗:", is_pass(s))
+print("等级:", grade(s))
+
+`, hint:"照抄 is_pass 的样子：def grade(score): 里面 if / elif / elif / else，每个分支 return 一个词。",
+  answer:`def is_pass(score):
+    return score >= 60
+
+def grade(score):
+    if score >= 90:
+        return "优秀"
+    elif score >= 75:
+        return "良好"
+    elif score >= 60:
+        return "及格"
+    else:
+        return "不及格"
+
+s = int(input())
+print("及格了吗:", is_pass(s))
+print("等级:", grade(s))`},
+
+ {type:"exercise", id:"E10", deliver:false, title:"练习：平均分函数",
+  mascot:"最短的函数<b>只有一行</b>！但有讲究：除法自带小数，int() 负责去掉它。",
+  task:[
+   "写一个 <b>average(nums)</b>：接收一个数字列表，return 它的平均分。",
+   "输入一行空格隔开的数字，输出平均、以及取整后的平均。"],
+  steps:[
+   "def average(nums): 里面就一行：return sum(nums) / len(nums)。",
+   "除法结果自带小数（90.0），直接输出。",
+   "取整用 int()：把 90.0 变成 90。",
+   "试试输入 1 1 2：平均是 1.333…，取整是多少？"],
+  input:"80 90 100\n",
+  expected:`平均: 90.0
+平均取整: 90`,
+  starter:`# 写 average(nums) 函数：sum / len 相除
+
+nums = [int(x) for x in input().split()]
+print("平均:", average(nums))
+print("平均取整:", int(average(nums)))
+
+`, hint:"函数体就一行：return sum(nums) / len(nums)。除法自带小数，int() 负责去掉小数。",
+  answer:`def average(nums):
+    return sum(nums) / len(nums)
+
+nums = [int(x) for x in input().split()]
+print("平均:", average(nums))
+print("平均取整:", int(average(nums)))`},
+
+ {type:"lab", id:"LAB11", title:"动画实验室：用函数画一朵雪花",
+  mascot:"这个月的主角是<b>函数</b>——自己发明新命令。定义一次 画花瓣()，想画几瓣的雪花，都只是一句话的事。",
+  intro:[
+   "这里的代码定义了两个函数：<b>画花瓣(长)</b> 画一片花瓣，<b>画花(花瓣数)</b> 调用它画出整朵花。函数里还能调用别的函数！",
+   "画花瓣的口诀：前进 → 右转(60) → 前进 → 右转(120)，来回两趟正好转满 360 度，回到出发点。画出来是一个尖尖的花瓣，六片拼起来就是雪花。",
+   "画花里那句 <b>右转(360 / 花瓣数)</b>：6 瓣花每次转 60 度，8 瓣花每次转 45 度——花瓣数一改，角度自动跟着算。"],
+  starter:`# 先定义：画一片花瓣
+def 画花瓣(长):
+    for i in range(2):
+        前进(长)
+        右转(60)
+        前进(长)
+        右转(120)
+
+# 再定义：画一朵整花（调用上面的函数）
+def 画花(花瓣数):
+    for i in range(花瓣数):
+        画花瓣(45)              # 调用第一个函数
+        右转(360 / 花瓣数)
+
+跳到(200, 150)
+变色("tomato")
+画花(6)                        # 只改这里，就能换花
+
+跳到(200, 150)                 # 回到中心画花蕊
+变色("goldenrod")
+画圆(200, 150, 14)`,
+  tip:"函数的好处现在看得见了：画花(6) 改成 画花(8)，花瓣数量变了，花瓣怎么画一个字都没改——「写一次，到处用」。",
+  tryThis:[
+   "把 画花(6) 改成 画花(8) 和 画花(12)，哪种雪花最好看？",
+   "把 画花瓣(45) 的 45 改成 60，花瓣变大",
+   "挑战两朵雪花：画完一朵后 跳到(120, 210)，换个颜色再 画花(5)"],
+  tip2:"注意顺序：必须先 def 定义，后面才能调用。把 画花(6) 挪到 def 前面试试，会报 NameError——这也是这个月的考点。"},
+]},
+
+{lv:"Lv.12", month:"第 6 月", name:"游戏开发与综合实践", items:[
+ {type:"lesson", id:"L12-1", title:"游戏的心脏：主循环",
+  mascot:"最后一单元！<b>所有游戏的心跳</b>，今天揭秘。学完你就知道游戏为什么能一直跑。",
+  intro:[
+   "所有游戏的骨架都是同一个循环：<b>读操作 → 更新状态 → 判断结束 → 再来一轮</b>。",
+   "图形化的 pygame 需要装在电脑上，网页里跑不了；但游戏<b>背后的逻辑</b>用文字就能练。",
+   "下面的例子：生命每轮 −3，降到 0 以下就结束——这就是主循环的雏形。"],
+  analogy:"主循环是游戏的<b>心跳</b>：一秒跳几十次，每次跳都做三件事——看玩家按了什么、更新所有东西的位置、检查该不该结束。心跳停了，游戏就「卡死」。你玩的每个游戏，从贪吃蛇到原神，里面都有一个这样的循环在跳。",
+  lineNotes:[
+   [`hp = 10`, "游戏开始时的状态：生命值 10"],
+   [`while hp > 0:`, "心跳循环：只要还活着，就再来一轮"],
+   [`    hp = hp - 3`, "每一跳更新一次状态（这里是被扣血）"],
+   [`print("游戏结束")`, "hp ≤ 0 时条件不成立，循环停，游戏结束"]],
+  tryThis:[
+   "把 -3 改成 -1，游戏多了几轮？",
+   "加一个 money = 0，每轮 +5 并打印，看着钱越花越多（不对，越涨越多）",
+   "想想：while True 和 while hp > 0，哪个需要自己想办法停？"],
+  example:{input:"", code:`hp = 10
+while hp > 0:
+    print("生命:", hp)
+    hp = hp - 3
+print("游戏结束")`},
+  tip:"以后在 pygame 里，这个 while 换成 while running，读操作换成「键盘鼠标事件」，骨架一模一样。"},
+
+ {type:"lesson", id:"L12-2", title:"碰撞检测：用坐标判断撞没撞",
+  mascot:"<b>撞没撞？</b>两行代码搞定。赛车、吃鸡、贪吃蛇，全靠这两行。",
+  intro:[
+   "游戏里「撞上了吗」其实是四句话：<b>x 方向重叠，并且 y 方向重叠</b>。",
+   "两个方块，A 从 ax 往右宽 asize，B 从 bx 往右宽 bsize：只要 A 的右边没越过 B 的左边、B 的右边也没越过 A 的左边，x 方向就重叠。",
+   "写成代码就是：<b>ax < bx + bsize and bx < ax + asize</b>。y 方向同理，两个都用 and 连起来。"],
+  analogy:"两块积木放在桌上，什么时候算「叠在一起」？从<b>上面看</b>（x 方向）要叠得上，<b>从侧面看</b>（y 方向）也要叠得上——两个方向<b>都</b>叠上了才算撞。只要有一个方向分得开，就还碰不到。所以最后用的是 and，不是 or。",
+  lineNotes:[
+   [`def hit(ax, ay, asize, bx, by, bsize):`, "六个参数：A 的坐标和边长、B 的坐标和边长"],
+   [`    ox = ax < bx + bsize and bx < ax + asize`, "x 方向重叠吗？两个条件<b>都</b>要成立，用 and 连"],
+   [`    oy = ay < by + bsize and by < ay + asize`, "y 方向同理"],
+   [`    return ox and oy`, "两个方向都重叠，才算真的撞上"]],
+  tryThis:[
+   "print(hit(0, 0, 5, 6, 0, 5))——撞没撞？先猜再验",
+   "把 and 改成 or，看看结果多离谱",
+   "挑战：写一个 not_hit(...)，返回「没撞」"],
+  example:{input:"", code:`def hit(ax, ay, asize, bx, by, bsize):
+    ox = ax < bx + bsize and bx < ax + asize
+    oy = ay < by + bsize and by < ay + asize
+    return ox and oy
+
+print(hit(0, 0, 5, 2, 3, 5))
+print(hit(0, 0, 5, 10, 0, 5))`},
+  tip:"第二个为什么是 False？A 占 0~5，B 占 10~15，中间隔着 5 格，根本碰不到。"},
+
+ {type:"exercise", id:"E11", deliver:true, title:"练习：猜拳三局两胜",
+  mascot:"用代码<b>当裁判</b>！以后猜拳再也不吵架——程序说了算。",
+  task:[
+   "三行输入，每行是 A 和 B 的出拳（石头 / 剪刀 / 布，空格隔开）。逐局输出胜负，最后输出比分。",
+   "规则：石头赢剪刀、剪刀赢布、布赢石头。用字典 <b>beats</b> 判断（已经写好了）。"],
+  steps:[
+   "beats 已写好：beats[a] 是「a 能打赢的那出拳」。beats[\"石头\"] 是 \"剪刀\"。",
+   "a == b → 平局。",
+   "beats[a] == b → A 赢：print(\"A 出\", a, \"赢了\")，a_win += 1。",
+   "都不是 → B 赢。循环外面打印比分，格式照期望输出。"],
+  input:"石头 剪刀\n剪刀 布\n布 布\n",
+  expected:`A 出 石头 赢了
+A 出 剪刀 赢了
+平局
+比分 2 : 0`,
+  starter:`beats = {"石头": "剪刀", "剪刀": "布", "布": "石头"}
+a_win = 0
+b_win = 0
+for _ in range(3):
+    a, b = input().split()
+    # a == b → 平局
+    # beats[a] == b → A 赢：打印 A 出 出拳 赢了，a_win + 1
+    # 否则 → B 赢：打印 B 赢了，b_win + 1
+
+print("比分", a_win, ":", b_win)
+
+`, hint:"beats[\"石头\"] 是 \"剪刀\"，意思是「石头赢剪刀」。所以 beats[a] == b 就说明 A 赢。",
+  answer:`beats = {"石头": "剪刀", "剪刀": "布", "布": "石头"}
+a_win = 0
+b_win = 0
+for _ in range(3):
+    a, b = input().split()
+    if a == b:
+        print("平局")
+    elif beats[a] == b:
+        print("A 出", a, "赢了")
+        a_win += 1
+    else:
+        print("B 赢了")
+        b_win += 1
+print("比分", a_win, ":", b_win)`},
+
+ {type:"exercise", id:"E12", deliver:false, title:"练习：碰撞检测函数",
+  mascot:"最后一关！把课上的 <b>hit 函数</b>补完整——游戏碰撞的核心，就这两行。",
+  task:[
+   "把课上的 hit 函数补完整。输入六个数：A 的 x、y、边长，B 的 x、y、边长。",
+   "输出「撞上了！」或「没有撞」。"],
+  steps:[
+   "hit 函数里补两行：ox 和 oy。",
+   "ox = ax < bx + bsize and bx < ax + asize；oy 同理。",
+   "最后一行改成 return ox and oy（现在写的是 return False，永远不撞）。",
+   "想一下：为什么是 and 不是 or？两个方向只要有一个分开，就撞不上。"],
+  input:"0 0 5 2 3 5\n",
+  expected:`撞上了！`,
+  starter:`def hit(ax, ay, asize, bx, by, bsize):
+    # ox = x 方向重叠, oy = y 方向重叠
+    # return ox and oy
+    return False
+
+ax, ay, asize, bx, by, bsize = [int(x) for x in input().split()]
+if hit(ax, ay, asize, bx, by, bsize):
+    print("撞上了！")
+else:
+    print("没有撞")
+
+`, hint:"照抄课上的两行：ox = ax < bx + bsize and bx < ax + asize，oy 同理。",
+  answer:`def hit(ax, ay, asize, bx, by, bsize):
+    ox = ax < bx + bsize and bx < ax + asize
+    oy = ay < by + bsize and by < ay + asize
+    return ox and oy
+
+ax, ay, asize, bx, by, bsize = [int(x) for x in input().split()]
+if hit(ax, ay, asize, bx, by, bsize):
+    print("撞上了！")
+else:
+    print("没有撞")`},
+
+ {type:"lab", id:"LAB12", title:"动画实验室：弹跳小球小游戏",
+  mascot:"决战实验室！把这两个月学的<b>主循环</b>和<b>碰撞</b>合体，做一个真正会动的小球游戏——它就是所有游戏的最小骨架。",
+  intro:[
+   "游戏主循环每帧做四件事：<b>清空() → 画圆 → 等待(16) → 更新位置</b>。每秒约 60 帧，人眼看起来就是连续动画。",
+   "<b>x = x + dx</b>：dx 是每帧走多远。碰墙反弹只需一行 <b>dx = -dx</b>——速度变成反方向，球就弹回去了。这就是这单元学的碰撞检测。",
+   "if x < 14 or x > 386：14 是球的半径，386 是右墙 400 减半径——碰到「球心离墙只剩一个半径」就算撞上。"],
+  starter:`# 弹跳小球：主循环 + 碰撞反弹
+x, y = 60, 80
+dx, dy = 6, 5          # 每帧走多远（速度）
+
+for frame in range(200):     # 播 200 帧约 7 秒
+    清空()
+    变色("cornflowerblue")
+    画圆(x, y, 14)
+    等待(16)
+    x = x + dx
+    y = y + dy
+    if x < 14 or x > 386:    # 碰到左右墙 → 左右反弹
+        dx = -dx
+    if y < 14 or y > 286:    # 碰到上下墙 → 上下反弹
+        dy = -dy`,
+  tip:"对比一下这单元的碰撞练习：hit() 算两个方块撞没撞，这里的 if x < 14 是球撞墙——逻辑一模一样，都是「位置到达边界就翻转方向」。",
+  tryThis:[
+   "把 dx, dy 改成 12, 10，球变快",
+   "让球经过中间时变色：在画圆前加 if 180 < x < 220: 变色(\"tomato\")",
+   "挑战双球：再设一组 x2, y2, dx2, dy2，一个红色一个蓝色，看它们会不会「相撞」（擦肩时变色试试）"],
+  tip2:"这里用 for range(200) 而不是 while True：实验室最多录 300 帧。想弹更久，把 200 改成 300，或者随时按「停止」。"},
+]},
+];
+
+const REVIEW = ["print() 命令","input() 命令","变量","基础数据类型","字符串拼接","if / if-else","for 循环","循环变量","while 循环","and / or","字符串基础","列表常用命令","split() 分割","字符串遍历","列表统计命令","列表生成式","sorted() 排序","字典","集合","break / continue","for 循环嵌套","枚举法","二维列表","函数基础"];
+
+/* ================= 趣味系统 ================= */
+const PRAISE = ["太厉害了，一次通过！","皮皮惊了：这也太快了吧！","又下一关！","稳！这题拿下了。","通过！离通关又近一步。","这波操作很丝滑。","起飞！代码小能手实锤了。"];
+const PRAISE_DELIVER = ["交付物完成！这可是能写进「作品集」的东西。","又一件作品出炉！集齐 6 件就算通关。"];
+const OOPS = ["差一点点！对着下面的差异找一找。","别急，皮皮第一次也错了三次。","就差一点！检查一下空格、标点和冒号。","报错不可怕——报错最后一句就是线索。","这题的坑皮皮也踩过，再来一次。"];
+const CONFETTI_COLORS = ["#E4572E","#2F7A5C","#F2B705","#3E7CB1","#C74FA8","#4C8C3F"];
+
+function levelOf(xp){
+  if(xp >= 180) return "通关大师 ★★★★";
+  if(xp >= 140) return "代码高手 ★★★";
+  if(xp >= 90)  return "中级程序员 ★★";
+  if(xp >= 40)  return "初级程序员 ★";
+  return "见习程序员";
+}
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* ================= 音效系统（Web Audio 合成，无音频文件） ================= */
+let actx = null;
+function sfx(kind){
+  if(state.sound === false) return;
+  try{
+    if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if(actx.state === "suspended") actx.resume();
+    const t = actx.currentTime;
+    const note = (f, st, dur, type, vol)=>{
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type || "triangle"; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t + st);
+      g.gain.linearRampToValueAtTime(vol || 0.16, t + st + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + st + dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t + st); o.stop(t + st + dur + 0.05);
+    };
+    if(kind === "pass"){        // 通过：上行四音阶
+      [523.25, 659.25, 783.99, 1046.50].forEach((f,i)=> note(f, i*0.09, 0.22));
+    }else if(kind === "level"){ // 升级：小号角
+      [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((f,i)=> note(f, 0.45 + i*0.12, 0.3, "triangle", 0.18));
+    }else if(kind === "fail"){  // 再试一次：低音两声，柔和
+      note(311.13, 0, 0.18, "sine", 0.11);
+      note(233.08, 0.16, 0.28, "sine", 0.11);
+    }else if(kind === "click"){ // 点选：轻哒一声
+      note(880, 0, 0.06, "sine", 0.07);
+    }else if(kind === "run"){   // 运行：短促提示
+      note(660, 0, 0.08, "sine", 0.08);
+      note(990, 0.07, 0.06, "sine", 0.06);
+    }
+  }catch(e){}
+}
+function confetti(){
+  for(let i = 0; i < 70; i++){
+    const d = document.createElement("div");
+    d.className = "confetto";
+    d.style.left = (Math.random()*100) + "vw";
+    d.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    d.style.width = (6 + Math.random()*7) + "px";
+    d.style.height = (10 + Math.random()*9) + "px";
+    d.style.animationDuration = (1.2 + Math.random()*0.9) + "s";
+    d.style.animationDelay = (Math.random()*0.35) + "s";
+    document.body.appendChild(d);
+    setTimeout(()=> d.remove(), 2400);
+  }
+}
+
+/* ================= 状态 ================= */
+const KEY = "py_p2_learn_v2";
+let state = {done:{}, review:{}, draft:{}, xp:0};
+try{ state = Object.assign(state, JSON.parse(localStorage.getItem(KEY) || "{}")); }catch(e){}
+if(state.xp === undefined) state.xp = 0;
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+let currentId = null;
+let outBuf = [], errBuf = [];
+
+/* ================= 渲染导航 ================= */
+function findItem(id){
+  for(const u of UNITS) for(const it of u.items) if(it.id === id) return it;
+  return null;
+}
+function renderNav(){
+  const nav = document.getElementById("nav");
+  let html = "";
+  for(const u of UNITS){
+    const exs = u.items.filter(i=>i.type==="exercise");
+    const allDone = exs.length > 0 && exs.every(i=>state.done[i.id]);
+    html += `<div class="unit-group"><div class="unit-head"><span class="lv">${u.lv}</span>${u.name} · ${u.month}${allDone ? '<span class="trophy">★</span>' : ""}</div>`;
+    for(const it of u.items){
+      const ok = it.type === "exercise" && state.done[it.id] ? '<span class="ok">✓</span>' : "";
+      const kind = it.type === "lesson" ? "课" : it.type === "lab" ? "玩" : (it.deliver ? "交付" : "练");
+      const short = it.type === "lab" ? (it.title.split("：")[1] || it.title) : it.type === "lesson" ? it.title.split("：")[0].split(":")[0] : it.title.replace(/^练习：/,"");
+      html += `<div class="nav-item ${currentId===it.id?"active":""}" data-id="${it.id}" title="${it.title}">
+        <span class="kind">${kind}</span><span>${short}</span>${ok}</div>`;
+    }
+    html += `</div>`;
+  }
+  html += `<div class="review-toggle" id="revToggle"><span>赛考真题 24 讲（点击勾选）</span><span id="revArrow">▸</span></div>
+    <div class="review-list" id="revList">` +
+    REVIEW.map((n,i)=>`<div class="review-item ${state.review["r"+i]?"on":""}" data-r="${i}">
+      <span class="num">${i+1}</span><span>${n}</span></div>`).join("") +
+    `</div>`;
+  nav.innerHTML = html;
+  nav.querySelectorAll(".nav-item").forEach(el=>{
+    el.onclick = ()=>{ sfx("click"); currentId = el.dataset.id; renderNav(); renderView(); window.scrollTo({top:0}); };
+  });
+  const t = document.getElementById("revToggle");
+  t.onclick = ()=>{
+    const l = document.getElementById("revList");
+    l.classList.toggle("open");
+    document.getElementById("revArrow").textContent = l.classList.contains("open") ? "▾" : "▸";
+  };
+  nav.querySelectorAll(".review-item").forEach(el=>{
+    el.onclick = ()=>{
+      const k = "r" + el.dataset.r;
+      state.review[k] = !state.review[k]; save(); renderNav(); renderStats();
+    };
+  });
+}
+
+function renderStats(){
+  const ex = UNITS.flatMap(u=>u.items).filter(i=>i.type==="exercise");
+  const d = ex.filter(i=>i.deliver && state.done[i.id]).length;
+  const xp = state.xp || 0;
+  document.getElementById("sEx").textContent = ex.filter(i=>state.done[i.id]).length;
+  document.getElementById("sDe").textContent = d;
+  document.getElementById("sXp").textContent = xp + " / 180";
+  document.getElementById("sLv").textContent = levelOf(xp);
+  document.getElementById("lvlFill").style.width = Math.min(100, xp / 180 * 100) + "%";
+  document.getElementById("sRv").textContent = Object.values(state.review).filter(Boolean).length;
+}
+
+/* ================= 渲染内容 ================= */
+const SNAKE_SVG = `<svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true">
+  <circle cx="24" cy="24" r="17" fill="#6FA65C"/>
+  <circle cx="24" cy="24" r="17" fill="none" stroke="#4C8C3F" stroke-width="1.5"/>
+  <circle cx="18" cy="20" r="5.4" fill="#fff"/>
+  <circle cx="30" cy="20" r="5.4" fill="#fff"/>
+  <circle cx="19" cy="21" r="2.5" fill="#1A1D21"/>
+  <circle cx="29" cy="21" r="2.5" fill="#1A1D21"/>
+  <path d="M18 31c2 2.4 4 3.4 6 3.4s4-1 6-3.4" stroke="#2F5F25" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M24 37v3.5m0 0l-3 2.4m3-2.4l3 2.4" stroke="#E4572E" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+const SNAKE_RUN_SVG = SNAKE_SVG.replace('width="30" height="30"','width="24" height="24"');
+
+function mascotHtml(it){
+  return `<div class="mascot"><div class="face">${SNAKE_SVG}</div><div class="bubble">${it.mascot}</div></div>`;
+}
+
+function renderView(){
+  const it = findItem(currentId);
+  const main = document.getElementById("main");
+  if(!it){ main.innerHTML = mascotHtml({mascot:"欢迎来到 Python 第二阶段！我是皮皮，会在每节课陪你闯关。<b>左边选一节课</b>开始吧。"}) +
+    `<div class="card"><h3><span class="bar"></span>怎么玩</h3>
+    <p>每个单元先学两课，再做两道练习——<b>练习判题通过，这一关才算过</b>，还能拿经验值升级。</p>
+    <p style="margin-top:8px;">带「交付」标记的练习就是单元交付物，六个全部通过 + 集齐 180 经验，就是「通关大师」。</p></div>`; return; }
+
+  const unit = UNITS.find(u=>u.items.includes(it));
+  let html = `<div class="crumb">${unit.lv} · ${unit.name} · ${unit.month}</div><h2 class="title">${it.title}</h2>`;
+
+  if(it.type === "lesson"){
+    html += mascotHtml(it) +
+      `<div class="meta-line">先看要点和比喻，再改着玩示例代码——改成报错也没关系，报错是最好的老师。</div>
+      <div class="card"><h3><span class="bar"></span>这节课的要点</h3><ol>${it.intro.map(x=>`<li>${x}</li>`).join("")}</ol></div>
+      <div class="card analogy"><h3><span class="bar"></span>打个比方</h3><p>${it.analogy}</p></div>
+      <div class="card"><h3><span class="bar"></span>示例代码（改完点运行）</h3>
+        <div class="ed-label">代码</div><textarea class="code" id="code">${esc(it.example.code)}</textarea>
+        ${it.example.input ? `<div class="ed-label">程序要「听」的输入（每行一条，input() 按行取用）</div><textarea class="stdin" id="stdin">${esc(it.example.input)}</textarea>` : ""}
+        <div class="btns"><button class="run" id="btnRun">▶ 运行</button>
+          <button class="ghost" id="btnLn">逐行讲解</button>
+          <button class="ghost" id="btnRef">对照正确代码</button>
+          <button class="ghost" id="btnFill">一键填入正确代码</button></div>
+        <div class="out" id="out"><pre class="empty">运行后，程序的输出会出现在这里</pre></div>
+        <div class="fold" id="refFold"><p>正确代码在这里——和你的代码逐行对照，重点看空格、逗号、冒号这些小地方：</p><pre>${esc(it.example.code)}</pre></div>
+        <div class="fold" id="lnFold">${it.lineNotes.map(x=>`<div class="ln"><pre>${esc(x[0])}</pre><p>${x[1]}</p></div>`).join("")}</div>
+        ${it.tip ? `<p class="note">提示｜${it.tip}</p>` : ""}</div>
+      <div class="card try"><h3><span class="bar"></span>试一试（改坏了也不怕，随时恢复）</h3>
+        <ul>${it.tryThis.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+  } else if(it.type === "lab"){
+    html += mascotHtml(it) +
+      `<div class="meta-line">这里的代码不输出文字，而是直接在下面的画布上画图、做动画。第一次运行要先加载引擎。</div>
+      <div class="card"><h3><span class="bar"></span>这里的命令</h3><ol>${it.intro.map(x=>`<li>${x}</li>`).join("")}</ol></div>
+      <div class="card"><h3><span class="bar"></span>画布</h3>
+        <canvas id="labCanvas" width="400" height="300"></canvas>
+        <div class="ed-label">代码</div><textarea class="code" id="code">${esc(draftOf(it))}</textarea>
+        <div class="btns"><button class="run" id="btnRun">▶ 运行</button>
+          <button class="ghost" id="btnStop">■ 停止</button>
+          <button class="ghost" id="btnClear">擦干净画布</button>
+          <button class="ghost" id="btnReset">恢复示例</button></div>
+        <div class="out" id="labOut"><pre class="empty">运行后，这里会显示提示或报错</pre></div>
+        ${it.tip ? `<p class="note">提示｜${it.tip}</p>` : ""}
+        ${it.tip2 ? `<p class="note">提示｜${it.tip2}</p>` : ""}</div>
+      <div class="card try"><h3><span class="bar"></span>试一试（从易到难，逐个挑战）</h3>
+        <ul>${it.tryThis.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+  } else {
+    const deliverTag = it.deliver ? '<span class="deliver-tag">单元交付物</span>' : "";
+    html = `<div class="crumb">${unit.lv} · ${unit.name} · ${unit.month}</div>
+      <h2 class="title">${it.title.replace("练习：","练习 · ")}${deliverTag}</h2>` +
+      mascotHtml(it) +
+      `${it.deliver ? `<div class="big-tip">这是本单元的交付物：判题通过 + 能讲清每行代码在做什么，才算真的完成。</div>` : ""}
+      <div class="card"><h3><span class="bar"></span>解题路线图</h3><ol>${it.steps.map(x=>`<li>${x}</li>`).join("")}</ol></div>
+      <div class="card"><h3><span class="bar"></span>题目</h3><ol>${it.task.map(x=>`<li>${x}</li>`).join("")}</ol>
+        <div class="io"><div class="io-body">
+          <div><div class="lbl">本次输入（已填好，判题就用它）</div><pre>${esc(it.input)}</pre></div>
+          <div><div class="lbl">期望输出</div><pre>${esc(it.expected)}</pre></div>
+        </div></div></div>
+      <div class="card"><h3><span class="bar"></span>写代码</h3>
+        <div class="ed-label">代码（Tab 键可以缩进）</div><textarea class="code" id="code">${esc(draftOf(it))}</textarea>
+        <div class="ed-label">输入</div><textarea class="stdin" id="stdin">${esc(it.input)}</textarea>
+        <div class="btns"><button class="run" id="btnRun">▶ 先跑跑看</button>
+          <button class="submit" id="btnJudge">✓ 提交判题</button>
+          <button class="ghost" id="btnReset">恢复初始代码</button>
+          <button class="ghost" id="btnFillAns">一键填入参考答案</button>
+          <button class="hint-btn" id="btnHint">看提示</button>
+          <button class="hint-btn" id="btnAns">看答案</button></div>
+        <div class="out" id="out"><pre class="empty">运行结果会出现在这里</pre></div>
+        <div class="verdict" id="verdict"></div>
+        <div class="fold" id="hintFold"><p>${it.hint}</p></div>
+        <div class="fold" id="ansFold"><p>参考答案——尽量先自己试 15 分钟再看：</p><pre>${esc(it.answer)}</pre></div></div>`;
+  }
+  main.innerHTML = html;
+  wireView(it);
+}
+
+function draftOf(it){
+  if(state.draft[it.id] !== undefined) return state.draft[it.id];
+  return it.type === "lesson" ? it.example.code : it.starter;
+}
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function wireView(it){
+  const ta = document.getElementById("code");
+  if(!ta) return;
+  ta.value = draftOf(it);
+  ta.addEventListener("input", ()=>{ state.draft[it.id] = ta.value; save(); });
+  ta.addEventListener("keydown", e=>{
+    if(e.key === "Tab" && !e.shiftKey){
+      e.preventDefault();
+      const s = ta.selectionStart, en = ta.selectionEnd;
+      ta.value = ta.value.slice(0,s) + "    " + ta.value.slice(en);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+    }
+  });
+  if(it.type === "lab"){
+    labBind(document.getElementById("labCanvas"));
+    const runBtn = document.getElementById("btnRun");
+    if(runBtn) runBtn.onclick = ()=> labRun(it, ta);
+    const stopBtn = document.getElementById("btnStop");
+    if(stopBtn) stopBtn.onclick = ()=>{ lab.stopped = true; sfx("click"); };
+    const clearBtn = document.getElementById("btnClear");
+    if(clearBtn) clearBtn.onclick = ()=>{ sfx("click"); labReset(); };
+    const resetBtn = document.getElementById("btnReset");
+    if(resetBtn) resetBtn.onclick = ()=>{ sfx("click"); ta.value = it.starter; state.draft[it.id] = it.starter; save(); labReset(); };
+    return;
+  }
+  const runBtn = document.getElementById("btnRun");
+  if(runBtn) runBtn.onclick = ()=>{ sfx("run"); runAndShow(false); };
+  const j = document.getElementById("btnJudge");
+  if(j) j.onclick = ()=>{ sfx("click"); runAndShow(true); };
+  const r = document.getElementById("btnReset");
+  if(r) r.onclick = ()=>{ sfx("click"); ta.value = it.starter; state.draft[it.id] = it.starter; save(); };
+  const h = document.getElementById("btnHint");
+  if(h) h.onclick = ()=>{ sfx("click"); document.getElementById("hintFold").classList.toggle("open"); };
+  const a = document.getElementById("btnAns");
+  if(a) a.onclick = ()=>{ sfx("click"); document.getElementById("ansFold").classList.toggle("open"); };
+  const ln = document.getElementById("btnLn");
+  if(ln) ln.onclick = ()=>{ sfx("click"); document.getElementById("lnFold").classList.toggle("open"); };
+  const rf = document.getElementById("btnRef");
+  if(rf) rf.onclick = ()=>{ sfx("click"); document.getElementById("refFold").classList.toggle("open"); };
+  const fl = document.getElementById("btnFill");
+  if(fl) fl.onclick = ()=>{
+    sfx("click");
+    ta.value = it.example.code;
+    state.draft[it.id] = ta.value; save();
+    document.getElementById("refFold").classList.add("open");
+    document.getElementById("out").querySelector("pre").textContent = "已填入正确代码，点「▶ 运行」看看它输出什么，再改回你自己的版本试一次。";
+  };
+  const fa = document.getElementById("btnFillAns");
+  if(fa) fa.onclick = ()=>{
+    sfx("click");
+    ta.value = it.answer;
+    state.draft[it.id] = ta.value; save();
+    document.getElementById("ansFold").classList.add("open");
+    document.getElementById("out").querySelector("pre").textContent = "已填入参考答案。先点「✓ 提交判题」确认能过，再试着把其中一行改成自己的写法。";
+  };
+}
+
+/* ================= Pyodide 引擎 ================= */
+const CDN = "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/";
+let pyodidePromise = null;
+function setEngine(st, txt){
+  const d = document.getElementById("eDot"), t = document.getElementById("eTxt");
+  d.className = "dot" + (st ? " " + st : "");
+  t.textContent = txt;
+}
+async function loadEngine(){
+  if(pyodidePromise) return pyodidePromise;
+  setEngine("loading", "正在加载 Python 引擎（首次约 20–60 秒）…");
+  pyodidePromise = (async ()=>{
+    await new Promise((res, rej)=>{
+      const s = document.createElement("script");
+      s.src = CDN + "pyodide.js";
+      s.onload = res;
+      s.onerror = ()=> rej(new Error("引擎脚本加载失败，请检查网络后刷新"));
+      document.head.appendChild(s);
+    });
+    const py = await loadPyodide({indexURL: CDN});
+    py.setStdout({batched:(s)=> outBuf.push(s)});
+    py.setStderr({batched:(s)=> errBuf.push(s)});
+    setEngine("ready", "Python 引擎就绪");
+    return py;
+  })();
+  pyodidePromise.catch(()=>{ setEngine("", "引擎加载失败"); pyodidePromise = null; });
+  return pyodidePromise;
+}
+
+const PREAMBLE = `import builtins as _b
+_lines = _INPUT_LINES
+_i = [0]
+def _input(prompt=""):
+    if prompt:
+        print(prompt, end="")
+    if _i[0] < len(_lines):
+        v = _lines[_i[0]]
+        _i[0] += 1
+        return v
+    print("")
+    return ""
+_b.input = _input
+`;
+
+function norm(s){
+  return s.replace(/\r/g,"").split("\n").map(l=>l.replace(/\s+$/,"")).join("\n").replace(/\n+$/,"");
+}
+
+/* ================= 动画实验室（先录分镜，再逐帧播放） ================= */
+const lab = {canvas:null, ctx:null, tx:200, ty:150, ang:0, pen:true,
+  color:"#1A1D21", stopped:false, frames:[], cur:null, ops:0, pendingClear:false};
+let labBridged = false;
+const LAB_MAX_FRAMES = 300, LAB_MAX_OPS = 4000;
+
+function labBind(c){
+  if(!c) return;
+  lab.canvas = c; lab.ctx = c.getContext("2d");
+  labReset();
+}
+function labBlank(){ if(lab.ctx) lab.ctx.clearRect(0, 0, 400, 300); }
+function labMarker(){
+  if(!lab.ctx) return;
+  const c = lab.ctx;
+  c.save(); c.translate(lab.tx, lab.ty);
+  c.fillStyle = "#DCEAD4";
+  c.beginPath(); c.arc(0, 0, 9, 0, Math.PI * 2); c.fill();
+  c.strokeStyle = "#4C8C3F"; c.lineWidth = 1.6; c.stroke();
+  c.rotate(lab.ang * Math.PI / 180);
+  c.fillStyle = "#E4572E";
+  c.beginPath(); c.moveTo(8, 0); c.lineTo(-3, -4.5); c.lineTo(-3, 4.5); c.closePath(); c.fill();
+  c.restore();
+}
+function labReset(){
+  lab.tx = 200; lab.ty = 150; lab.ang = 0; lab.pen = true; lab.color = "#1A1D21";
+  lab.stopped = false; lab.frames = []; lab.ops = 0; lab.pendingClear = false;
+  lab.cur = {ops:[], dur:0, clear:true};
+  labBlank();
+}
+function labPush(op){
+  lab.ops++;
+  if(lab.ops > LAB_MAX_OPS) throw new Error("画的东西太多啦（超过 " + LAB_MAX_OPS + " 步）——多半是循环停不下来，检查一下 while 的条件。");
+  lab.cur.ops.push(op);
+}
+function labNextFrame(clear){
+  if(lab.frames.length >= LAB_MAX_FRAMES) throw new Error("帧数太多（超过 " + LAB_MAX_FRAMES + " 帧）——动画的循环停不下来，给它加一个结束条件吧。");
+  lab.frames.push(lab.cur);
+  lab.cur = {ops:[], dur:0, clear:clear};
+}
+function labForward(d){
+  const rad = lab.ang * Math.PI / 180;
+  const nx = lab.tx + Math.cos(rad) * d, ny = lab.ty + Math.sin(rad) * d;
+  if(lab.pen) labPush({t:"line", x1:lab.tx, y1:lab.ty, x2:nx, y2:ny, color:lab.color});
+  lab.tx = nx; lab.ty = ny;
+}
+function labBridge(py){
+  if(labBridged) return;
+  labBridged = true;
+  const g = (n, f)=> py.globals.set(n, f);
+  g("前进", d=> labForward(d));
+  g("后退", d=> labForward(-d));
+  g("右转", a=>{ lab.ang += a; });
+  g("左转", a=>{ lab.ang -= a; });
+  g("抬笔", ()=>{ lab.pen = false; });
+  g("落笔", ()=>{ lab.pen = true; });
+  g("变色", c=>{ lab.color = c; });
+  g("跳到", (x, y)=>{ lab.tx = x; lab.ty = y; });
+  g("画圆", (x, y, r)=> labPush({t:"circle", x:x, y:y, r:r, color:lab.color}));
+  g("画方块", (x, y, w, h)=> labPush({t:"rect", x:x, y:y, w:w, h:h, color:lab.color}));
+  g("写字", (x, y, s)=> labPush({t:"text", x:x, y:y, s:String(s), color:lab.color}));
+  g("清空", ()=>{ lab.pendingClear = true; });
+  g("等待", ms=>{ lab.cur.dur = ms; lab.cur.clear = !!lab.pendingClear; lab.pendingClear = false; labNextFrame(false); });
+}
+function labSleep(ms){ return new Promise(r=> setTimeout(r, ms)); }
+async function labDrawLine(op){
+  const c = lab.ctx;
+  const len = Math.hypot(op.x2 - op.x1, op.y2 - op.y1);
+  const steps = Math.max(2, Math.min(26, Math.round(len / 10)));
+  c.strokeStyle = op.color; c.lineWidth = 3; c.lineCap = "round";
+  for(let i = 1; i <= steps; i++){
+    const t1 = (i - 1) / steps, t2 = i / steps;
+    c.beginPath();
+    c.moveTo(op.x1 + (op.x2 - op.x1) * t1, op.y1 + (op.y2 - op.y1) * t1);
+    c.lineTo(op.x1 + (op.x2 - op.x1) * t2, op.y1 + (op.y2 - op.y1) * t2);
+    c.stroke();
+    await labSleep(Math.max(4, Math.round(80 / steps)));
+  }
+}
+async function labPlay(){
+  for(const f of lab.frames){
+    if(lab.stopped) throw new Error("stopped");
+    if(f.clear) labBlank();
+    for(const op of f.ops){
+      if(lab.stopped) throw new Error("stopped");
+      if(op.t === "line"){
+        await labDrawLine(op);
+      }else if(op.t === "circle"){
+        const c = lab.ctx;
+        c.strokeStyle = op.color; c.lineWidth = 3;
+        c.beginPath(); c.arc(op.x, op.y, op.r, 0, Math.PI * 2); c.stroke();
+        await labSleep(22);
+      }else if(op.t === "rect"){
+        const c = lab.ctx;
+        c.fillStyle = op.color; c.fillRect(op.x, op.y, op.w, op.h);
+        await labSleep(22);
+      }else if(op.t === "text"){
+        const c = lab.ctx;
+        c.fillStyle = op.color; c.font = "13px 'PingFang SC','Microsoft YaHei',sans-serif";
+        c.fillText(op.s, op.x, op.y);
+        await labSleep(15);
+      }
+    }
+    if(f.dur) await labSleep(f.dur);
+  }
+  const usedPen = lab.frames.some(f=> f.ops.some(o=> o.t === "line"));
+  if(usedPen) labMarker();
+}
+async function labRun(it, ta){
+  const outEl = document.getElementById("labOut").querySelector("pre");
+  const btns = document.querySelectorAll(".btns button");
+  btns.forEach(b=> b.disabled = true);
+  sfx("run");
+  labReset();
+  outEl.classList.remove("empty");
+  outEl.innerHTML = `<span class="running-line"><span class="dots"><i></i><i></i><i></i></span>正在运行代码…</span>`;
+  try{
+    const py = await loadEngine();
+    labBridge(py);
+    lab.frames = []; lab.cur = {ops:[], dur:0, clear:true}; lab.ops = 0; lab.stopped = false; lab.pendingClear = false;
+    await py.runPythonAsync(ta.value);
+    lab.frames.push(lab.cur);
+    outEl.innerHTML = `<span class="running-line"><span class="dots"><i></i><i></i><i></i></span>代码跑完了，正在播放它画的画…</span>`;
+    await labPlay();
+    outEl.textContent = "画完了！对照下面「试一试」，看看还能让它画什么。";
+    sfx("pass");
+  }catch(e){
+    const msg = String(e.message || e);
+    outEl.innerHTML = "<span class='err'>" + esc(msg === "stopped" || msg.includes("已按停止") ? "已按停止按钮，播放停下来了。按「▶ 运行」可以重新开始。" : msg) + "</span>";
+    sfx("fail");
+  }
+  btns.forEach(b=> b.disabled = false);
+}
+
+async function runAndShow(judge){
+  const it = findItem(currentId);
+  if(!it) return;
+  const ta = document.getElementById("code");
+  const stdinEl = document.getElementById("stdin");
+  const outBox = document.getElementById("out");
+  const outEl = outBox.querySelector("pre");
+  const btns = document.querySelectorAll(".btns button");
+  btns.forEach(b=> b.disabled = true);
+  outBuf = []; errBuf = [];
+  outBox.classList.remove("pop","shake");
+  try{
+    const py = await loadEngine();
+    const lines = stdinEl && stdinEl.value ? stdinEl.value.replace(/\r/g,"").split("\n") : [];
+    while(lines.length && lines[lines.length-1] === "") lines.pop();
+    py.globals.set("_INPUT_LINES", lines);
+    outEl.classList.remove("empty");
+    outEl.innerHTML = `<span class="running-line"><span class="dots"><i></i><i></i><i></i></span>程序运行中…</span>`;
+    await py.runPythonAsync(PREAMBLE + "\n" + ta.value);
+    outEl.textContent = outBuf.join("\n") || "(程序没有输出任何内容)";
+    if(errBuf.length){
+      const e = document.createElement("span");
+      e.className = "err";
+      e.textContent = "\n" + errBuf.join("\n");
+      outEl.appendChild(e);
+    }
+    if(errBuf.length){
+      outBox.classList.add("shake");
+      setTimeout(()=> outBox.classList.remove("shake"), 600);
+    }else{
+      outBox.classList.add("pop");
+      const r = document.createElement("div");
+      r.className = "snake-run";
+      r.innerHTML = SNAKE_RUN_SVG;
+      outBox.appendChild(r);
+      setTimeout(()=> r.remove(), 1500);
+    }
+    if(judge) judgeNow(it, outBuf.join("\n"));
+  }catch(e){
+    outEl.classList.remove("empty");
+    outEl.innerHTML = "<span class='err'>" + esc(String(e.message || e)) + "</span>";
+    if(errBuf.length) outEl.innerHTML += "<span class='err'>" + esc(errBuf.join("\n")) + "</span>";
+    outBox.classList.add("shake");
+    setTimeout(()=> outBox.classList.remove("shake"), 600);
+    if(judge){
+      const v = document.getElementById("verdict");
+      v.className = "verdict fail";
+      v.innerHTML = pick(OOPS) + " 程序没能正常跑完——先看看上面的红色报错。";
+    }
+  }
+  btns.forEach(b=> b.disabled = false);
+}
+
+function judgeNow(it, userOut){
+  const v = document.getElementById("verdict");
+  const ok = norm(userOut) === norm(it.expected);
+  if(ok){
+    const isNew = !state.done[it.id];
+    const oldLv = levelOf(state.xp || 0);
+    if(isNew){
+      state.done[it.id] = true;
+      const gain = it.deliver ? 20 : 10;
+      state.xp = (state.xp || 0) + gain;
+      save(); renderNav(); renderStats(); confetti();
+      v.className = "verdict pass";
+      v.innerHTML = pick(it.deliver ? PRAISE_DELIVER : PRAISE) +
+        `<span class="xp-gain">+${gain} 经验</span>` +
+        (it.deliver ? " 别忘了：给家人讲一遍每行代码在做什么。" : " 继续下一关。");
+    }else{
+      v.className = "verdict pass";
+      v.innerHTML = "✓ 判题通过（这关你已经过了）。继续下一关。";
+    }
+    sfx("pass");
+    if(levelOf(state.xp || 0) !== oldLv) sfx("level");
+  }else{
+    sfx("fail");
+    v.className = "verdict fail";
+    v.innerHTML = `<b>✗ ${pick(OOPS)}</b>` +
+      `<div class="diff"><div class="a"><div class="t">你的输出</div><pre>${esc(norm(userOut) || "(空)")}</pre></div>` +
+      `<div class="b"><div class="t">期望输出</div><pre>${esc(norm(it.expected))}</pre></div></div>`;
+  }
+}
+
+/* ================= 启动 ================= */
+const sndBtn = document.getElementById("btnSnd");
+function renderSnd(){ sndBtn.textContent = state.sound === false ? "音效：关" : "音效：开"; }
+sndBtn.onclick = ()=>{
+  state.sound = state.sound === false ? true : false;
+  save(); renderSnd();
+  if(state.sound !== false) sfx("click");
+};
+renderSnd();
+
+currentId = "L7-1";
+renderNav();
+renderStats();
+renderView();
+</script>
+</body>
+</html>
